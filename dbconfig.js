@@ -1,7 +1,7 @@
 
 var host = 'localhost';
 if(process.env.NODE_ENV === 'production'){
-    host = preocess.env.prodHost;
+    host = process.env.prodHost;
 }
 
 const config = {

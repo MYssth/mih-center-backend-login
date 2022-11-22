@@ -35,7 +35,7 @@ async function login(personnel) {
     }
     catch (error) {
         console.error(error);
-        console.log("====================");
+        return { "status": "error", "message": error.message };
     }
 }
 
@@ -49,7 +49,6 @@ async function authen(token) {
     }
     catch (error) {
         console.error(error);
-        console.log("====================");
         return { "status": "error", "message": error.message };
     }
 
