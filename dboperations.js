@@ -16,8 +16,12 @@ async function login(personnel) {
             console.log("ID found checking password");
             const match = await bcrypt.compare(personnel.personnel_secret, result.recordset[0].personnel_secret);
             if (match) {
-                console.log("Login success");
-                var token = jwt.sign({ "personnel_id": personnel.personnel_id }, process.env.privateKey, { expiresIn: "10h" });
+                console.log("Login success prepare jwt for "+personnel.personnel_id);
+                let levelList = await pool.request().input('personnel_id', sql.VarChar, personnel.personnel_id).query("SELECT level_id FROM personnel_level_list WHERE personnel_id = @personnel_id");
+                var token = jwt.sign({ "personnel_id": personnel.personnel_id,
+                "personnel_name": result.recordset[0].personnel_firstname+" "+result.recordset[0].personnel_lastname,
+                "level_list": levelList.recordset }, process.env.privateKey, { expiresIn: "10h" });
+                console.log("jwt prepare complete = "+token);
                 console.log("====================");
                 return { "status": "ok", "message": "เข้าสู่ระบบสำเร็จ", token };
             }
@@ -42,7 +46,7 @@ async function login(personnel) {
 async function authen(token) {
 
     try {
-        console.log("authen request");
+        console.log("authen request from "+token);
         console.log("====================");
         var decoded = jwt.verify(token, process.env.privateKey);
         return { "status": "ok", decoded };
