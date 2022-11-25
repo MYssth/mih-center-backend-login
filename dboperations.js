@@ -17,7 +17,8 @@ async function login(personnel) {
             const match = await bcrypt.compare(personnel.personnel_secret, result.recordset[0].personnel_secret);
             if (match) {
                 console.log("Login success prepare jwt for "+personnel.personnel_id);
-                let levelList = await pool.request().input('personnel_id', sql.VarChar, personnel.personnel_id).query("SELECT level_id FROM personnel_level_list WHERE personnel_id = @personnel_id");
+                let levelList = await pool.request().input('personnel_id', sql.VarChar, personnel.personnel_id).query("SELECT personnel_level_list.level_id, personnel_levels.mihapp_id FROM personnel_level_list "+
+                "INNER JOIN personnel_levels ON personnel_levels.level_id = personnel_level_list.level_id WHERE personnel_id = @personnel_id");
                 var token = jwt.sign({ "personnel_id": personnel.personnel_id,
                 "personnel_name": result.recordset[0].personnel_firstname+" "+result.recordset[0].personnel_lastname,
                 "level_list": levelList.recordset }, process.env.privateKey, { expiresIn: "10h" });
