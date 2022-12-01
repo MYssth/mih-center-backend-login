@@ -16,6 +16,12 @@ app.use('/api', router);
 
 router.use((request, response, next) => {
     //write authen here
+
+    response.setHeader('Access-Control-Allow-Origin', '*'); //หรือใส่แค่เฉพาะ domain ที่ต้องการได้
+    response.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
+    response.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    response.setHeader('Access-Control-Allow-Credentials', true);
+
     console.log('middleware');
     next();
 });
