@@ -21,7 +21,7 @@ async function login(personnel) {
                 "INNER JOIN personnel_levels ON personnel_levels.level_id = personnel_level_list.level_id WHERE personnel_id = @personnel_id");
                 var token = jwt.sign({ "personnel_id": personnel.personnel_id,
                 "personnel_name": result.recordset[0].personnel_firstname+" "+result.recordset[0].personnel_lastname,
-                "level_list": levelList.recordset }, process.env.privateKey, { expiresIn: "10h" });
+                "level_list": levelList.recordset }, process.env.privateKey, { expiresIn: "4h" });
                 console.log("jwt prepare complete = "+token);
                 console.log("====================");
                 return { "status": "ok", "message": "เข้าสู่ระบบสำเร็จ", token };
