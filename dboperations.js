@@ -4,6 +4,29 @@ const sql = require('mssql');
 const bcrypt = require('bcrypt');
 var jwt = require('jsonwebtoken');
 
+async function getSiteSettingData(){
+    
+    console.log("let getSiteSettingData");
+    const controller = new AbortController();
+    const signal = controller.signal;
+    const result = await fetch(`http://${process.env.backendHost}:${process.env.roleCrudPort}/api/getsitesetting`, { signal })
+        .then((response) => response.json())
+        .then((data) => {
+            console.log("getSiteSettingData complete");
+            return data;
+        })
+        .catch((error) => {
+            if (error.name === "AbortError") {
+                console.log("cancelled");
+            }
+            else {
+                console.error('Error:', error);
+            }
+        });
+    controller.abort();
+    return result;
+}
+
 async function login(personnel) {
 
     try {
@@ -24,10 +47,12 @@ async function login(personnel) {
                 console.log("Login success prepare jwt for " + personnel.personnel_id);
                 let levelList = await pool.request().input('personnel_id', sql.VarChar, personnel.personnel_id).query("SELECT personnel_level_list.level_id, personnel_level_list.view_id, personnel_levels.mihapp_id FROM personnel_level_list " +
                     "INNER JOIN personnel_levels ON personnel_levels.level_id = personnel_level_list.level_id WHERE personnel_id = @personnel_id");
+                const siteInfo = await getSiteSettingData();
                 var token = jwt.sign({
                     "personnel_id": personnel.personnel_id,
                     "personnel_name": result.recordset[0].personnel_firstname + " " + result.recordset[0].personnel_lastname,
-                    "level_list": levelList.recordset
+                    "level_list": levelList.recordset,
+                    "site_info": siteInfo 
                 }, process.env.privateKey, { expiresIn: "4h" });
                 console.log("jwt prepare complete = " + token);
                 console.log("====================");
