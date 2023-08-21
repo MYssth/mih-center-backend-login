@@ -33,9 +33,9 @@ router.route("/health").get((request, response) => {
 });
 
 router.route("/login").post((request, response) => {
-  let personnel = { ...request.body };
+  let psn = { ...request.body };
   dboperations
-    .login(personnel)
+    .login(psn)
     .then((result) => {
       response.json(result);
     })
@@ -61,6 +61,20 @@ router.route("/authen").post((request, response) => {
 router.route("/verify/:id/:secret").get((request, response) => {
   dboperations
     .verify(request.params.id, request.params.secret)
+    .then((result) => {
+      response.json(result);
+    })
+    .catch((err) => {
+      console.error(err);
+      response.sendStatus(500);
+    });
+});
+
+router.route("/secretchg").post((request, response) => {
+  const token = request.headers.authorization.split(" ")[1];
+  let psn = { ...request.body };
+  dboperations
+    .secretChg(psn, token)
     .then((result) => {
       response.json(result);
     })
