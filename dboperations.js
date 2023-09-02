@@ -6,13 +6,13 @@ const bcrypt = require("bcrypt");
 var jwt = require("jsonwebtoken");
 
 async function getAllPSNData() {
-  console.log("let getAllPSNData");
+  console.log("let getAllPSN");
   const result = await fetch(
-    `http://${process.env.backendHost}:${process.env.himsPort}/api/himspsn/getallpsndata`
+    `http://${process.env.backendHost}:${process.env.himsPort}/api/himspsn/getallpsn`
   )
     .then((response) => response.json())
     .then((data) => {
-      console.log("getAllPSNData complete");
+      console.log("getAllPSN complete");
       return data;
     })
     .catch((error) => {
