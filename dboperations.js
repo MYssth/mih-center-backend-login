@@ -41,7 +41,7 @@ async function genJWT(psn_id, psn_name) {
       lv_list: lvList.recordset,
     },
     process.env.privateKey,
-    { expiresIn: '4h', issuer: process.env.iss, algorithm: "HS256" }
+    { expiresIn: "4h", issuer: process.env.iss, algorithm: "HS256" }
   );
   console.log("jwt prepare complete = " + token);
   return token;
@@ -73,23 +73,24 @@ async function login(data) {
         const match = await bcrypt.compare(data.psn_secret, psn.secret);
         if (match) {
           console.log("password matched");
+          const token = await genJWT(
+            data.psn_id,
+            himsPsn[foundIndex].pname +
+              "" +
+              himsPsn[foundIndex].fname +
+              " " +
+              himsPsn[foundIndex].lname
+          );
           if (psn.exp_date <= new Date()) {
             console.log("password expire");
             console.log("====================");
             return {
               status: "expire",
               message: "กรุณาเปลี่ยนรหัสผ่านใหม่เนื่องจากรหัสผ่านหมดอายุ",
+              token,
             };
           } else {
             console.log("login id = " + data.psn_id + " success");
-            const token = await genJWT(
-              data.psn_id,
-              himsPsn[foundIndex].pname +
-                "" +
-                himsPsn[foundIndex].fname +
-                " " +
-                himsPsn[foundIndex].lname
-            );
             console.log("====================");
             return { status: "ok", message: "เข้าสู่ระบบสำเร็จ", token };
           }
@@ -159,9 +160,7 @@ async function verify(psn_id, psn_secret) {
     let result = await pool
       .request()
       .input("psn_id", sql.VarChar, psn_id)
-      .query(
-        "SELECT secret FROM psn WHERE id = @psn_id"
-      );
+      .query("SELECT secret FROM psn WHERE id = @psn_id");
     console.log("verify for id = " + psn_id);
     if (result.recordset.length != 0) {
       const match = await bcrypt.compare(
